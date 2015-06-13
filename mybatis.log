@@ -1,4 +1,0 @@
-[ERROR][2015-02-06 22:54:19,231][com.alibaba.druid.pool.DruidAbstractDataSource]maxIdle is deprecated
-[INFO][2015-02-06 22:54:19,384][com.alibaba.druid.pool.DruidDataSource]{dataSource-1} inited
-[INFO][2015-02-06 22:54:20,949][TestSpringMybatis]test1
-[INFO][2015-02-06 22:54:20,960][com.alibaba.druid.pool.DruidDataSource]{dataSource-1} closed

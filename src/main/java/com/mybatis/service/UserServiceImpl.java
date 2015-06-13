@@ -30,15 +30,49 @@ public class UserServiceImpl implements  UserServiceI{
     @Autowired
     private UserMapper userMapper;
 
+
     @Override
     public User getUserById(int id) {
-        return userMapper.selectByPrimaryKey(id);
+        return userMapper.getUserByID(id);
+    }
+
+    @Override
+    public User getUserByName(String name) {
+        return userMapper.getUserByName(name);
     }
 
     @Override
     public List<User> getAllUser() {
         return userMapper.getAllUser();
     }
+
+    @Override
+    public int insertUser(User user) throws  Exception{
+        int num = 0;
+        try{
+            num = userMapper.insertUserSelective(user);
+            //throw new Exception("####################see roll back or not.");
+        }catch (Exception e){
+            throw e;
+        }
+        return num;
+    }
+
+    @Override
+    public int updByUserID(User user) {
+        return userMapper.updUserByIDSelective(user);
+    }
+
+    @Override
+    public int delUserByID(int id) {
+        return userMapper.delUserByID(id);
+    }
+
+    @Override
+    public int batchDelUserByIDs(List<String> ids) {
+        return userMapper.batchDelUserByIDs(ids);
+    }
+
 
 
 }

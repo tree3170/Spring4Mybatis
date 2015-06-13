@@ -1,34 +1,76 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--BIT，FLOAT，CHAR，TIMESTAMP，OTHER，UNDEFINED，TINYINT，REAL，VARCHAR，BINARY，BLOB，NVARCHAR，SMALLINT，DOUBLE，LONGVARCHAR，VARBINARY，CLOB，NCHAR，INTEGER，NUMERIC，DATE，LONGVARBINARY，BOOLEAN，NCLOB，BIGINT，DECIMAL，TIME，NULL，CURSOR-->
 <mapper namespace="com.mybatis.dao.UserMapper">
     <resultMap id="BaseResultMap" type="com.mybatis.model.User">
         <id column="ID" property="id" jdbcType="INTEGER"/>
         <result column="NAME" property="name" jdbcType="VARCHAR"/>
         <result column="PWD" property="pwd" jdbcType="VARCHAR"/>
-        <result column="CREATE_TIME" property="createTime" jdbcType="DATE"/>
-        <result column="UPDATE_TIME" property="updateTime" jdbcType="DATE"/>
+        <!--**************DATE会丢失时分秒，TIME,TIMESTAMP,可以精确到时分秒
+        如果不写jdbcType一样可以获取精确时间***********
+        在字段中有Date和DateTime类型，
+        在插入数据时只要将实体的属性设置成Timestamp就会对应mysql的DateTime类型，Date会对应mysql的Date类型。
+        -->
+        <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" javaType="DATE"/>
+        <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" javaType="DATE" />
     </resultMap>
+
     <sql id="Base_Column_List">
-    ID, NAME, PWD, CREATE_TIME, UPDATE_TIME
-  </sql>
-    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+     ID, NAME, PWD, CREATE_TIME, UPDATE_TIME
+    </sql>
+
+    <select id="getUserByID" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         select
         <include refid="Base_Column_List"/>
         from tuser
-        where ID = #{id,jdbcType=INTEGER}
+        where ID =  <![CDATA[#{id,jdbcType=INTEGER} ]]>
     </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    delete from tuser
-    where ID = #{id,jdbcType=INTEGER}
-  </delete>
-    <insert id="insert" parameterType="com.mybatis.model.User">
-    insert into tuser (ID, NAME, PWD, 
-      CREATE_TIME, UPDATE_TIME)
-    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{pwd,jdbcType=VARCHAR}, 
-      #{createTime,jdbcType=DATE}, #{updateTime,jdbcType=DATE})
-  </insert>
-    <insert id="insertSelective" parameterType="com.mybatis.model.User">
+
+    <select id="getUserByName" resultMap="BaseResultMap" parameterType="String">
+        select
+        <include refid="Base_Column_List"/>
+        from tuser
+        where NAME = <![CDATA[ #{name,jdbcType=VARCHAR} ]]>
+    </select>
+
+    <resultMap id="ResultUserMap" type="com.mybatis.model.User" extends="BaseResultMap">
+        <collection property="roles" javaType="list" ofType="com.mybatis.model.Role">
+            <id property="id" column="role_id"></id>
+            <result property="rolename" column="role_name"></result>
+        </collection>
+    </resultMap>
+
+    <select id="getAllUser" resultMap="ResultUserMap">
+<![CDATA[
+
+        SELECT
+            t.ID role_id,
+            t.ROLENAME role_name,
+            tu.ID ,
+            tu.NAME ,
+            tu.PWD,
+            tu.CREATE_TIME,
+            tu.UPDATE_TIME
+            FROM
+            trole t,
+            tuser tu,
+            userrole tur where tur.TROLEID = t.ID AND tur.TUSERID = tu.ID
+
+        ]]>
+    </select>
+
+    <insert id="insertUser" parameterType="com.mybatis.model.User">
+    <![CDATA[
+        insert into tuser (ID, NAME, PWD,
+          CREATE_TIME, UPDATE_TIME)
+        values
+        (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{pwd,jdbcType=VARCHAR},
+          #{createTime,jdbcType=DATE}, #{updateTime,jdbcType=DATE})
+        ]]>
+    </insert>
+
+    <insert id="insertUserSelective" parameterType="com.mybatis.model.User">
         insert into tuser
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -49,69 +91,69 @@
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
-                #{id,jdbcType=INTEGER},
+                <![CDATA[  #{id,jdbcType=INTEGER}, ]]>
             </if>
             <if test="name != null">
-                #{name,jdbcType=VARCHAR},
+                <![CDATA[  #{name,jdbcType=VARCHAR}, ]]>
             </if>
             <if test="pwd != null">
-                #{pwd,jdbcType=VARCHAR},
+                <![CDATA[   #{pwd,jdbcType=VARCHAR},]]>
             </if>
             <if test="createTime != null">
-                #{createTime,jdbcType=DATE},
+                <![CDATA[  #{createTime,jdbcType=DATE}, ]]>
             </if>
             <if test="updateTime != null">
-                #{updateTime,jdbcType=DATE},
+                <![CDATA[   #{updateTime,jdbcType=DATE}, ]]>
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.mybatis.model.User">
+
+    <update id="updUserByIDSelective" parameterType="com.mybatis.model.User">
         update tuser
         <set>
             <if test="name != null">
-                NAME = #{name,jdbcType=VARCHAR},
+                NAME = <![CDATA[#{name,jdbcType=VARCHAR},]]>
             </if>
             <if test="pwd != null">
-                PWD = #{pwd,jdbcType=VARCHAR},
+                PWD =<![CDATA[ #{pwd,jdbcType=VARCHAR},]]>
             </if>
             <if test="createTime != null">
-                CREATE_TIME = #{createTime,jdbcType=DATE},
+                CREATE_TIME =<![CDATA[ #{createTime,jdbcType=DATE},]]>
             </if>
             <if test="updateTime != null">
-                UPDATE_TIME = #{updateTime,jdbcType=DATE},
+                UPDATE_TIME = <![CDATA[#{updateTime,jdbcType=DATE},]]>
             </if>
         </set>
-        where ID = #{id,jdbcType=INTEGER}
+        where ID =<![CDATA[ #{id,jdbcType=INTEGER}]]>
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.mybatis.model.User">
-    update tuser
-    set NAME = #{name,jdbcType=VARCHAR},
-      PWD = #{pwd,jdbcType=VARCHAR},
-      CREATE_TIME = #{createTime,jdbcType=DATE},
-      UPDATE_TIME = #{updateTime,jdbcType=DATE}
-    where ID = #{id,jdbcType=INTEGER}
-  </update>
 
+    <update id="updUserByID" parameterType="com.mybatis.model.User">
+       <![CDATA[
 
-    <resultMap id="ResultUserMap" type="com.mybatis.model.User" extends="BaseResultMap">
-        <collection property="roles" javaType="list" ofType="com.mybatis.model.Role">
-            <id  property="id" column="role_id"></id>
-            <result property="rolename" column="role_name"></result>
-        </collection>
-    </resultMap>
-    <select id="getAllUser" resultMap="ResultUserMap">
+        update tuser
+        set NAME = #{name,jdbcType=VARCHAR},
+          PWD = #{pwd,jdbcType=VARCHAR},
+          CREATE_TIME = #{createTime,jdbcType=DATE},
+          UPDATE_TIME = #{updateTime,jdbcType=DATE}
+        where ID = #{id,jdbcType=INTEGER}
 
-        SELECT
-            t.ID role_id,
-            t.ROLENAME role_name,
-            tu.ID ,
-            tu.NAME ,
-            tu.PWD,
-            tu.CREATE_TIME,
-            tu.UPDATE_TIME
-            FROM
-            trole t,
-            tuser tu,
-            userrole tur where tur.TROLEID = t.ID AND tur.TUSERID = tu.ID
-    </select>
+        ]]>
+    </update>
+
+    <delete id="delUserByID" parameterType="java.lang.Integer">
+    <![CDATA[
+
+        delete from tuser
+        where ID = #{id,jdbcType=INTEGER}
+
+        ]]>
+    </delete>
+
+    <delete id="batchDelUserByIDs" parameterType="java.util.List">
+        DELETE FROM TUSER WHERE ID IN
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            <![CDATA[ #{item}  ]]>
+        </foreach>
+    </delete>
+
 </mapper>

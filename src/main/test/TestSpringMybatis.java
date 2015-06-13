@@ -10,7 +10,10 @@
 import com.alibaba.fastjson.JSON;
 import com.mybatis.model.User;
 import com.mybatis.service.UserServiceI;
+import com.mybatis.util.DateUtil;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +23,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -48,17 +54,85 @@ public class TestSpringMybatis {
         this.userServiceI = userServiceI;
     }
 
+    @Before
+    public void before(){
+        System.setProperty("springmvc.root","F:\\java_workspace\\ssm\\mybatisdemo1\\src\\main\\webapp");
+    }
+
 
     @Test
-    public void test(){
+    public void testGetUserByID(){
         User user = userServiceI.getUserById(1);
         logger.info(JSON.toJSONString(user));
         logger.info(JSON.toJSONStringWithDateFormat(user,"yyyy-MM-dd HH:mm:ss"));
     }
 
     @Test
+    public void testGetUserByName(){
+        User user = userServiceI.getUserByName("test1");
+        logger.info(JSON.toJSONStringWithDateFormat(user,"yyyy-MM-dd HH:mm:ss"));
+    }
+
+    @Test
     public void testGetAllUser(){
-        List<User> userList = userServiceI.getAllUser();
-        logger.info(JSON.toJSONStringWithDateFormat(userList,"yyyy-MM-dd HH:mm:ss"));
+        try {
+            List<User> userList = userServiceI.getAllUser();
+            logger.info("============="+JSON.toJSONStringWithDateFormat(userList,"yyyy-MM-dd HH:mm:ss"));
+            logger.error("#############"+userList.size());
+            logger.info("############"+ System.getProperty("springmvc.root"));
+          //  logger.info("############"+ System.getProperty("log4j.appender.Error_File.File"));
+        }catch (Exception e){
+            logger.info("############");
+            //logger.info("############"+ System.getProperty("log4j.appender.Error_File.File"));
+            logger.error(e);
+        }
+    }
+
+    @Test
+    public void testInsertUser(){
+        int count = 0;
+        try {
+            User user = new User();
+            user.setName("testinsert");
+            user.setPwd("123");
+            user.setCreateTime(DateUtil.getCurDate(DateUtil.DEFAULT_DATETIME_FORMAT_SEC));
+            logger.info("######DATETIME:"+new Date().getTime());
+            user.setUpdateTime(new Timestamp(new Date().getTime()));
+            count = userServiceI.insertUser(user);
+           // Assert.assertEquals("########not the expect result",1,count);
+        }catch (Exception e){
+           // Assert.assertEquals("########not the expect result",1,count);
+            logger.info("############");
+            //logger.info("############"+ System.getProperty("log4j.appender.Error_File.File"));
+            logger.error(e);
+        }
+        logger.info("#############count:"+count);
+    }
+
+    @Test
+    public void testUpdateUser() throws Exception {
+        User user = userServiceI.getUserByName("testinsert");
+        user.setPwd("125");
+        user.setUpdateTime(DateUtil.getCurDate(DateUtil.DEFAULT_DATETIME_FORMAT_SEC));
+        int num = userServiceI.updByUserID(user);
+        logger.info("###########num="+num);
+    }
+
+    @Test
+    public void testDelUser(){
+        User user = userServiceI.getUserByName("testinsert");
+        logger.info("============="+JSON.toJSONStringWithDateFormat(user,"yyyy-MM-dd HH:mm:ss"));
+       // int num = userServiceI.delUserByID(user.getId());
+       // logger.info("###########num="+num);
+    }
+
+    @Test
+    public void testBatchDelUsers(){
+        List ids = new ArrayList<String>();
+        ids.add("");
+        int num = userServiceI.batchDelUserByIDs(ids);
+        logger.info("###########num="+num);
+        // int num = userServiceI.delUserByID(user.getId());
+        // logger.info("###########num="+num);
     }
 }

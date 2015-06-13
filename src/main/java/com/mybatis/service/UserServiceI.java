@@ -26,5 +26,11 @@ import java.util.List;
  */
 public interface UserServiceI {
     public User getUserById(int id);
+    public User getUserByName(String name);
     public List<User> getAllUser();
+    public int insertUser(User user) throws Exception;
+    public int updByUserID(User user);
+    public int delUserByID(int id);
+    public int batchDelUserByIDs(List<String> ids);
+
 }

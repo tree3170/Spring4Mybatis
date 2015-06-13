@@ -3,6 +3,9 @@ package com.mybatis.model;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 用户表
+ */
 public class User {
     private List<Role> roles;
 
@@ -62,5 +65,17 @@ public class User {
 
     public void setRoles(List<Role> roles) {
         this.roles = roles;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "roles=" + roles +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                ", pwd='" + pwd + '\'' +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
     }
 }

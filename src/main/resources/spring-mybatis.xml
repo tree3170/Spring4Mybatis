@@ -59,12 +59,18 @@ http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
 		<property name="filters" value="mergeStat" />
 	</bean>
 
-	<!--  mybatis文件配置，扫描所有mapper文件（configLocation为mybatis属性 mapperLocations为所有mapper） -->
-	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-		<property name="dataSource" ref="dataSource" />
-        <property name="configLocation" value="classpath:mybatis-config.xml"/>
-		<!-- 自动扫描entity目录, 省掉Configuration.xml里的手工配置 -->
-		<property name="mapperLocations" value="classpath:com/mybatis/mapping/*.xml" />
+	<!--  mybatis文件配置，扫描所有mapper文件（configLocation为mybatis属性 mapperLocations为所有mapper）
+	 第一种直接用p标签表示，第二种用标签property表示
+	 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"
+            p:dataSource-ref="dataSource"
+            p:configLocation="classpath:mybatis-config.xml"
+            p:mapperLocations="classpath:com/mybatis/mapping/*.xml"
+            >
+		<!--<property name="dataSource" ref="dataSource" />-->
+        <!--<property name="configLocation" value="classpath:mybatis-config.xml"/>-->
+		<!--&lt;!&ndash; 自动扫描entity目录, 省掉Configuration.xml里的手工配置 &ndash;&gt;-->
+		<!--<property name="mapperLocations" value="classpath:com/mybatis/mapping/*.xml" />-->
 	</bean>
 
     <!-- spring与mybatis整合配置，扫描所有dao -->

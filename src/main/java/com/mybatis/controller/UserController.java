@@ -10,10 +10,13 @@ package com.mybatis.controller;
 
 import com.mybatis.model.User;
 import com.mybatis.service.UserServiceI;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -30,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 @RequestMapping("/userController")
 public class UserController {
+    private static Logger logger = Logger.getLogger(UserController.class);
 
     private UserServiceI userServiceI;
 
@@ -77,6 +81,20 @@ public class UserController {
     public String showUser2(@PathVariable String id, HttpServletRequest request){
         User  user = userServiceI.getUserById(Integer.valueOf(id));
         request.setAttribute("user",user);
+        return "showUser";
+    }
+
+    @RequestMapping("/searchUser")
+    public String getUser(@RequestParam(value="userID") String id,Model model ){
+        User  user = new User();
+        try{
+            user = userServiceI.getUserById(Integer.valueOf(id));
+            model.addAttribute("user",user);
+        }catch (Exception e) {
+            model.addAttribute("errorMsg",e.getMessage());
+            logger.error(e);
+        }
+        logger.info("######################User ID is " + id + ":" + user );
         return "showUser";
     }
 }
