@@ -9,6 +9,8 @@
 package com.mybatis.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.mybatis.model.User;
 import com.mybatis.service.UserServiceI;
 import org.apache.log4j.Logger;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -105,11 +108,33 @@ public class UserController {
      * @param request
      * @return
      */
-    @RequestMapping("/getAllUser2")
+    @RequestMapping("/getAllUserWithPage")
     public String getAllUser2(HttpServletRequest request){
-        List<User> users = userServiceI.getAllUser();
+
+        String str_pageNum = request.getParameter("pageNum");
+        String str_pageSize = request.getParameter("pageSize");
+        int pageNum = 0,pageSize = 0;
+        try {
+            pageNum = Integer.parseInt(str_pageNum);
+        } catch (NumberFormatException e) {
+            request.setAttribute("err", "页码只能是大于0的整数，请重新输入!");
+        }
+        try {
+            pageSize = Integer.parseInt(str_pageSize);
+        } catch (NumberFormatException e) {
+            request.setAttribute("err", "页面大小只能是大于0的整数，请重新输入!");
+        }
+        List<User> users = new ArrayList<User>();
+        try {
+            PageHelper.startPage(pageNum, pageSize);
+            List<User> list =  userServiceI.getAllUser();
+            PageInfo<User> page = new PageInfo(list,3);
+            request.setAttribute("page", page);
+        } catch (Exception e) {
+            request.setAttribute("err", "查询出错:" + e.getMessage());
+        }
         JSON.toJSONString("");
         request.setAttribute("user",users);
-        return "showUser";
+        return "fenYeDemo";
     }
 }
