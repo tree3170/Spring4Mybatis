@@ -23,7 +23,7 @@ public interface BaseDao<T> {
      * @param id
      * @return
      */
-    T getObjByID(Integer id);
+    public T getObjByID(Integer id);
 
     /**
      * 根据名获取对象
@@ -31,14 +31,14 @@ public interface BaseDao<T> {
      * @param name
      * @return 对象
      */
-    T getObjByName(String name);
+    public  T getObjByName(String name);
 
     /**
      * 获取所有对象
      *
      * @return 对象
      */
-    List<T> getAllObjs();
+    public List<T> getAllObjs();
 
     /**
      * 根据对象插入*所有字段*到db
@@ -47,7 +47,7 @@ public interface BaseDao<T> {
      * @return 插入结果（数量）
      * @deprecated 已经被删除的方法
      */
-    int insertObj(User record);
+    public int addObj(User record);
 
     /**
      * 根据对象有选择性的只插入*字段不为空*到db
@@ -55,7 +55,7 @@ public interface BaseDao<T> {
      * @param t  对象
      * @return 插入结果（数量）
      */
-    int insertObjSelective(T t);
+    public int addObjSelective(T t);
 
     /**
      * 根据主键ID查询并有选择性的只更新*字段不为空*到db
@@ -63,7 +63,7 @@ public interface BaseDao<T> {
      * @param t
      * @return 更新结果（数量）
      */
-    int updObjByIDSelective(T t);
+    public int updObjByIDSelective(T t);
 
     /**
      * 根据主键ID查询并*更新所有字段*到db
@@ -72,7 +72,7 @@ public interface BaseDao<T> {
      * @return 更新结果（数量）
      * @deprecated  已经被抛弃了的方法
      */
-    int updObjByID(T t);
+    public int updObjByID(T t);
 
     /**
      * 根据主键ID查询并删除对象
@@ -80,7 +80,7 @@ public interface BaseDao<T> {
      * @param id
      * @return 删除结果（数量）
      */
-    int delObjByID(Integer id);
+    public int delObjByID(Integer id);
 
     /**
      * 根据主键ID查询并删除对象
@@ -89,6 +89,6 @@ public interface BaseDao<T> {
      * @param ids
      * @return 删除结果（数量）
      */
-    int batchDelObjByIDs(List<String> ids);
+    public int batchDelObjByIDs(List<String> ids);
 
 }

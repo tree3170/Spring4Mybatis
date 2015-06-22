@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<!--BIT，FLOAT，CHAR，TIMESTAMP，OTHER，UNDEFINED，TINYINT，REAL，VARCHAR，BINARY，BLOB，NVARCHAR，SMALLINT，DOUBLE，LONGVARCHAR，VARBINARY，CLOB，NCHAR，INTEGER，NUMERIC，DATE，LONGVARBINARY，BOOLEAN，NCLOB，BIGINT，DECIMAL，TIME，NULL，CURSOR-->
+<!--BIT，FLOAT，CHAR，TIMESTAMP，OTHER，UNDEFINED，TINYINT，REAL，VARCHAR，BINARY，BLOB，NVARCHAR，
+SMALLINT，DOUBLE，LONGVARCHAR，VARBINARY，CLOB，NCHAR，INTEGER，NUMERIC，DATE，LONGVARBINARY，BOOLEAN，
+NCLOB，BIGINT，DECIMAL，TIME，NULL，CURSOR-->
 <mapper namespace="com.mybatis.dao.UserMapper">
     <resultMap id="BaseResultMap" type="com.mybatis.model.User">
         <id column="ID" property="id" jdbcType="INTEGER"/>
@@ -13,25 +15,25 @@
         在插入数据时只要将实体的属性设置成Timestamp就会对应mysql的DateTime类型，Date会对应mysql的Date类型。
         -->
         <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" javaType="DATE"/>
-        <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" javaType="DATE" />
+        <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP"  javaType="DATE"/>
     </resultMap>
 
     <sql id="Base_Column_List">
      ID, NAME, PWD, CREATE_TIME, UPDATE_TIME
     </sql>
 
-    <select id="getUserByID" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    <select id="getObjByID" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         select
         <include refid="Base_Column_List"/>
         from tuser
         where ID =  <![CDATA[#{id,jdbcType=INTEGER} ]]>
     </select>
 
-    <select id="getUserByName" resultMap="BaseResultMap" parameterType="String">
+    <select id="getObjByName" resultMap="BaseResultMap" parameterType="String">
         select
         <include refid="Base_Column_List"/>
         from tuser
-        where NAME = <![CDATA[ #{name,jdbcType=VARCHAR} ]]>
+        where NAME  LIKE CONCAT( CONCAT('%',<![CDATA[ #{name,jdbcType=VARCHAR} ]]>), '%')
     </select>
 
     <resultMap id="ResultUserMap" type="com.mybatis.model.User" extends="BaseResultMap">
@@ -41,7 +43,7 @@
         </collection>
     </resultMap>
 
-    <select id="getAllUser" resultMap="ResultUserMap">
+    <select id="getAllObjs" resultMap="ResultUserMap">
 <![CDATA[
 
         SELECT
@@ -60,7 +62,7 @@
         ]]>
     </select>
 
-    <insert id="insertUser" parameterType="com.mybatis.model.User">
+    <insert id="addObj" parameterType="com.mybatis.model.User">
     <![CDATA[
         insert into tuser (ID, NAME, PWD,
           CREATE_TIME, UPDATE_TIME)
@@ -70,7 +72,7 @@
         ]]>
     </insert>
 
-    <insert id="insertUserSelective" parameterType="com.mybatis.model.User">
+    <insert id="addObjSelective" parameterType="com.mybatis.model.User">
         insert into tuser
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -108,7 +110,7 @@
         </trim>
     </insert>
 
-    <update id="updUserByIDSelective" parameterType="com.mybatis.model.User">
+    <update id="updObjByIDSelective" parameterType="com.mybatis.model.User">
         update tuser
         <set>
             <if test="name != null">
@@ -127,7 +129,7 @@
         where ID =<![CDATA[ #{id,jdbcType=INTEGER}]]>
     </update>
 
-    <update id="updUserByID" parameterType="com.mybatis.model.User">
+    <update id="updObjByID" parameterType="com.mybatis.model.User">
        <![CDATA[
 
         update tuser
@@ -140,7 +142,7 @@
         ]]>
     </update>
 
-    <delete id="delUserByID" parameterType="java.lang.Integer">
+    <delete id="delObjByID" parameterType="java.lang.Integer">
     <![CDATA[
 
         delete from tuser
@@ -149,7 +151,7 @@
         ]]>
     </delete>
 
-    <delete id="batchDelUserByIDs" parameterType="java.util.List">
+    <delete id="batchDelObjByIDs" parameterType="java.util.List">
         DELETE FROM TUSER WHERE ID IN
         <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
             <![CDATA[ #{item}  ]]>

@@ -8,6 +8,7 @@
  * */
 package com.mybatis.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.mybatis.model.User;
 import com.mybatis.service.UserServiceI;
 import org.apache.log4j.Logger;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * Description.
@@ -95,6 +97,19 @@ public class UserController {
             logger.error(e);
         }
         logger.info("######################User ID is " + id + ":" + user );
+        return "showUser";
+    }
+
+    /**
+     * RESTFUL 形式访问http://localhost:8080/userController/1/showUser2.do
+     * @param request
+     * @return
+     */
+    @RequestMapping("/getAllUser2")
+    public String getAllUser2(HttpServletRequest request){
+        List<User> users = userServiceI.getAllUser();
+        JSON.toJSONString("");
+        request.setAttribute("user",users);
         return "showUser";
     }
 }

@@ -24,6 +24,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -91,8 +92,8 @@ public class TestSpringMybatis {
     @Test
     public void testInsertUser(){
         int count = 0;
+        User user = new User();
         try {
-            User user = new User();
             user.setName("testinsert");
             user.setPwd("123");
             user.setCreateTime(DateUtil.getCurDate(DateUtil.DEFAULT_DATETIME_FORMAT_SEC));
@@ -107,13 +108,17 @@ public class TestSpringMybatis {
             logger.error(e);
         }
         logger.info("#############count:"+count);
+
     }
 
     @Test
     public void testUpdateUser() throws Exception {
         User user = userServiceI.getUserByName("testinsert");
         user.setPwd("125");
-        user.setUpdateTime(DateUtil.getCurDate(DateUtil.DEFAULT_DATETIME_FORMAT_SEC));
+        user.setCreateTime(new java.sql.Date(new Date().getTime()));
+       // user.setUpdateTime(DateUtil.getCurDate(DateUtil.DEFAULT_DATETIME_FORMAT_SEC));
+        user.setUpdateTime(new Timestamp(new Date().getTime()));
+       // user.setUpdateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         int num = userServiceI.updByUserID(user);
         logger.info("###########num="+num);
     }
@@ -122,17 +127,18 @@ public class TestSpringMybatis {
     public void testDelUser(){
         User user = userServiceI.getUserByName("testinsert");
         logger.info("============="+JSON.toJSONStringWithDateFormat(user,"yyyy-MM-dd HH:mm:ss"));
-       // int num = userServiceI.delUserByID(user.getId());
-       // logger.info("###########num="+num);
+        int num = userServiceI.delUserByID(user.getId());
+        logger.info("###########num="+num);
     }
 
     @Test
     public void testBatchDelUsers(){
         List ids = new ArrayList<String>();
-        ids.add("");
+        ids.add("7");
+        ids.add("8");
         int num = userServiceI.batchDelUserByIDs(ids);
         logger.info("###########num="+num);
-        // int num = userServiceI.delUserByID(user.getId());
-        // logger.info("###########num="+num);
+//         int num = userServiceI.delUserByID(user.getId());
+//         logger.info("###########num="+num);
     }
 }

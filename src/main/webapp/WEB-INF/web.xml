@@ -120,6 +120,15 @@
         <error-code>500</error-code>
         <location>/WEB-INF/errorPage/500.jsp</location>
     </error-page>
+    <!-- 配置异常处理 -->
+    <error-page>
+        <exception-type>javax.servlet.ServletException</exception-type>
+        <location>/WEB-INF/errorPage/error.html</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.NullPointerException</exception-type>
+        <location>/WEB-INF/errorPage/error.html</location>
+    </error-page>
     <welcome-file-list>
         <welcome-file>/index.jsp</welcome-file>
     </welcome-file-list>

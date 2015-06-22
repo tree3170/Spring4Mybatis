@@ -33,24 +33,24 @@ public class UserServiceImpl implements  UserServiceI{
 
     @Override
     public User getUserById(int id) {
-        return userMapper.getUserByID(id);
+        return userMapper.getObjByID(id);
     }
 
     @Override
     public User getUserByName(String name) {
-        return userMapper.getUserByName(name);
+        return userMapper.getObjByName(name);
     }
 
     @Override
     public List<User> getAllUser() {
-        return userMapper.getAllUser();
+        return userMapper.getAllObjs();
     }
 
     @Override
     public int insertUser(User user) throws  Exception{
         int num = 0;
         try{
-            num = userMapper.insertUserSelective(user);
+            num = userMapper.addObjSelective(user);
             //throw new Exception("####################see roll back or not.");
         }catch (Exception e){
             throw e;
@@ -60,17 +60,17 @@ public class UserServiceImpl implements  UserServiceI{
 
     @Override
     public int updByUserID(User user) {
-        return userMapper.updUserByIDSelective(user);
+        return userMapper.updObjByIDSelective(user);
     }
 
     @Override
     public int delUserByID(int id) {
-        return userMapper.delUserByID(id);
+        return userMapper.delObjByID(id);
     }
 
     @Override
     public int batchDelUserByIDs(List<String> ids) {
-        return userMapper.batchDelUserByIDs(ids);
+        return userMapper.batchDelObjByIDs(ids);
     }
 
 
