@@ -42,10 +42,8 @@ NCLOB，BIGINT，DECIMAL，TIME，NULL，CURSOR-->
             <result property="rolename" column="role_name"></result>
         </collection>
     </resultMap>
-
+<!-- 这是一个User和role的关联查询，是个好的例子
     <select id="getAllObjs" resultMap="ResultUserMap">
-<![CDATA[
-
         SELECT
             t.ID role_id,
             t.ROLENAME role_name,
@@ -58,10 +56,20 @@ NCLOB，BIGINT，DECIMAL，TIME，NULL，CURSOR-->
             trole t,
             tuser tu,
             userrole tur where tur.TROLEID = t.ID AND tur.TUSERID = tu.ID
-
-        ]]>
     </select>
-
+-->
+    <select id="getAllObjs" resultMap="ResultUserMap">
+ <![CDATA[
+        SELECT
+            tu.ID ,
+            tu.NAME ,
+            tu.PWD,
+            tu.CREATE_TIME,
+            tu.UPDATE_TIME
+            FROM
+            tuser tu
+     ]]>
+    </select>
     <insert id="addObj" parameterType="com.mybatis.model.User">
     <![CDATA[
         insert into tuser (ID, NAME, PWD,

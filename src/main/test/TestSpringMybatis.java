@@ -94,12 +94,15 @@ public class TestSpringMybatis {
         int count = 0;
         User user = new User();
         try {
-            user.setName("testinsert");
-            user.setPwd("123");
-            user.setCreateTime(DateUtil.getCurDate(DateUtil.DEFAULT_DATETIME_FORMAT_SEC));
-            logger.info("######DATETIME:"+new Date().getTime());
-            user.setUpdateTime(new Timestamp(new Date().getTime()));
-            count = userServiceI.insertUser(user);
+            for(int i =0;i<20;i++){
+                user.setName("testinsert"+i);
+                user.setPwd("123");
+                user.setCreateTime(DateUtil.getCurDate(DateUtil.DEFAULT_DATETIME_FORMAT_SEC));
+                logger.info("######DATETIME:"+new Date().getTime());
+                user.setUpdateTime(new Timestamp(new Date().getTime()));
+                count = userServiceI.insertUser(user);
+            }
+
            // Assert.assertEquals("########not the expect result",1,count);
         }catch (Exception e){
            // Assert.assertEquals("########not the expect result",1,count);

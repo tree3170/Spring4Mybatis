@@ -20,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -82,11 +83,12 @@ public class UserController {
      * @param request
      * @return
      */
+    @ResponseBody
     @RequestMapping("/{id}/showUser2")
     public String showUser2(@PathVariable String id, HttpServletRequest request){
         User  user = userServiceI.getUserById(Integer.valueOf(id));
-        request.setAttribute("user",user);
-        return "showUser";
+        request.setAttribute("user",JSON.toJSONString(user));
+         return JSON.toJSONString(user);
     }
 
     @RequestMapping("/searchUser")
@@ -104,12 +106,12 @@ public class UserController {
     }
 
     /**
-     * RESTFUL 形式访问http://localhost:8080/userController/1/showUser2.do
+     * RESTFUL 形式访问http://localhost:8080/mybatisdemo1/userController/getAllUserWithPage.do?pageNum=1&pageSize=10
      * @param request
      * @return
      */
     @RequestMapping("/getAllUserWithPage")
-    public String getAllUser2(HttpServletRequest request){
+    public String getAllUserWithPage(HttpServletRequest request){
 
         String str_pageNum = request.getParameter("pageNum");
         String str_pageSize = request.getParameter("pageSize");
@@ -131,10 +133,47 @@ public class UserController {
             PageInfo<User> page = new PageInfo(list,3);
             request.setAttribute("page", page);
         } catch (Exception e) {
-            request.setAttribute("err", "查询出错:" + e.getMessage());
+            request.setAttribute("errorMsg", "查询出错:" + e.getMessage());
         }
         JSON.toJSONString("");
+        request.setAttribute("pageNum", pageNum);
+        request.setAttribute("pageSize", pageSize);
         request.setAttribute("user",users);
         return "fenYeDemo";
     }
+
+    /**
+     * RESTFUL 形式访问http://localhost:8080/mybatisdemo1/userController/29/delUser.do?pageNum=1&pageSize=10
+     * @param id
+     * @param request
+     * @return
+     */
+    @RequestMapping("/{id}/delUser")
+    public String delUser(@PathVariable String id, HttpServletRequest request){
+        String str_pageNum = request.getParameter("pageNum");
+        String str_pageSize = request.getParameter("pageSize");
+        try {
+            PageHelper.startPage(Integer.valueOf(str_pageNum), Integer.valueOf(str_pageSize));
+            int num =  userServiceI.delUserByID(Integer.valueOf(id));
+            if(1 == num) {
+                //TODO 加上删除用户的详细信息
+                logger.info("删除用户成功");
+                List<User> list =  userServiceI.getAllUser();
+                PageInfo<User> page = new PageInfo(list,3);
+                request.setAttribute("page", page);
+            }else{
+                logger.error("删除用户失败");
+                throw new Exception("删除用户数量为"+num);
+            }
+        } catch (Exception e) {
+            //TODO 加上删除用户的详细信息
+            logger.error("删除用户失败",e);
+            request.setAttribute("errorMsg", "查询出错:" + e.getMessage());
+        }
+        return "fenYeDemo";
+    }
+
+
+
+
 }
