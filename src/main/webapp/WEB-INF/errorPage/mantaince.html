@@ -1,0 +1,60 @@
+﻿<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>网页短时间维护倒计时js代码 - 懒人建站-jquery特效-建站素材 http:/www.51xuediannao.com/</title>
+<style>
+html{*overflow:auto;_overflow-x:hidden;-webkit-text-size-adjust:none;height:100%;
+background:#80CBF3}
+body{margin:0; height:100%;
+font-family:"Microsoft YaHei",tahoma,arial,simsun;}
+p,h1,h2,h3,h4{ margin-top:0; margin-bottom:0;}
+.main{ width:850px; margin:0 auto;}
+.container{ padding-left:390px; padding-top:180px;}
+h1{ font-size:42px;}
+h2{ font-size:22px; font-weight:100; margin-top:2px; margin-bottom:2px;}
+h3{ font-size:26px; color:#2F2D2E;}
+.Countdown{ padding-top: 30px; font-size:30px; font-family: tahoma,arial,simsun; color: #4A4A4A;}
+.Countdown span{ display:inline-block;*display:inline;*zoom:1; width:55px;line-height:55px;text-align:center; background-color:#fff; margin-left:2px;}
+.Countdown .bd{ width:16px; background-image:none;}
+:root .Countdown span{}
+</style>
+  
+</head>
+
+<body>
+<div class="main">
+	<div class="container">
+    	<div class="content">
+            <h1>懒人建站正在维护中...</h1>
+            <h2>将给您带来全新的体验</h2>
+            <h3>敬请期待</h3>
+        </div>
+        <div class="Countdown" id="time">
+            <span id="m"></span><span class="bd">:</span><span id="s"></span>
+        </div>
+    </div>
+</div>
+<script>
+var m = 10;//传个分钟数到这里	前段路上制作 http://www.51xuediannao.com/qd63/
+var s = 60;
+function showtime(){
+	document.getElementById('m').innerHTML = m;
+	document.getElementById('s').innerHTML = s;
+	s = s-1;
+	if(s==0){
+		m = m -1;
+		s = 60
+	}
+	if(m==0){
+		window.location='http://www.51xuediannao.com';//倒计时结束跳转到 懒人建站 http://www.51xuediannao.com/
+	}
+}
+clearInterval(settime); 
+var settime = setInterval(function(){
+	showtime();
+},1000);
+</script>
+<h1><a href="http:/www.51xuediannao.com/" target="_blank" style="color:#fff; display:none;">懒人建站-jquery特效-建站素材</a></h1>
+</body>
+</html>

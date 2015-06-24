@@ -1,3 +1,8 @@
+<%@ page import="com.mybatis.service.UserServiceI" %>
+<%@ page import="com.mybatis.service.UserServiceImpl" %>
+<%@ page import="com.mybatis.model.User" %>
+<%@ page import="com.alibaba.fastjson.JSON" %>
+<%@ page import="java.util.Date" %>
 <%--
     User:     Darlen liu
     Date:     15-6-22 下午2:40
@@ -9,8 +14,6 @@
     String path = request.getContextPath();
     String bathPath = request.getScheme() + "://" + request.getServerName() + ":" + request
             .getServerPort() + path + "/";
-
-
 %>
 <html>
 <head>
@@ -86,34 +89,73 @@
 
     <script type="text/javascript" src="http://apps.bdimg.com/libs/jquery/2.0.0/jquery.js"></script>
     <script type="text/javascript">
-    $(function(){
-
-    })
-        function getme(id){
-            //$("#myModal").modal('toggle').on("show.bs.modal", function(e) {
-               // var link = $(e.relatedTarget);
+        $(function(){
+            //for search event
+            $(".search").click(function(event){
+               var userID = $(this).parent().parent().find("td:eq(1)").text();
+                //$("#myModal").modal('toggle').on("show.bs.modal", function(e) {
+                // var link = $(e.relatedTarget);
                 //$(this).find(".modal-body").load(link.attr("href"));
-               // alert(1)
-           // });
-            $.ajax({
-                url:"userController/"+id+"/showUser2.do",
-                method:"GET",
-                //async:"true",
-                //dataType:"json",
-                success: function(result){
-                    //alert(result)
-                    var json1 =eval(result);
+                // alert(1)
+                // });
+                $.ajax({
+                    url:"userController/"+userID+"/showUser2.do",
+                    method:"GET",
+                    dataType:"json",
+                    success: function(result){
+                        var retVal =result;
+                        $("#idForSearch").val(retVal.id);
+                        $("#nameForSearch").val(retVal.name).attr("disabled","disabled");
+                        $("#pwdForSearch").val(retVal.pwd).attr("disabled","disabled");
+                        $("#myModal").modal('toggle');
+                    }
 
-                    //填充表格
-                    alert(result);
-                }
+                })
+                // $('#myModal').modal('toggle').on('show',function(){
+                //})
 
+            });
+
+            //for edit event
+            $("#editModal").click(function(event){
+                $("#nameForSearch").removeAttr("disabled");
+                $("#pwdForSearch").removeAttr("disabled");
+                //this.value="更新";
+                $("#updateModal").show();
+                $(this).hide();
+            });
+
+            //for update event
+            $("#updateModal").click(function(event){
+                var user ={
+                            'id' : $("#idForSearch").val(),
+                            'name' : $("#nameForSearch").val(),
+                            'pwd' : $("#pwdForSearch").val()
+                 };
+                $.ajax({
+                    url:"userController/updateUser.do",
+                    data:user,
+                    method:"POST",
+                    dataType:"JSON",
+                    success: function(result){
+                        if("1" ==  result) {
+                            alert("更新成功");
+                            $("#myModal").modal('toggle');
+                            window.location.reload()
+                        }else{
+                            alert("更新失败:"+result);
+                            $("#myModal").modal('toggle');
+                        }
+                    }
+
+                })
+            });
+            $("#closeModal").click(function(){
+                $("#myModal").on("hidden.bs.model",function(e){$(this).removeData();});
             })
-           // $('#myModal').modal('toggle').on('show',function(){
 
-            //})
+        })
 
-        }
 </script>
 
 </head>
@@ -124,24 +166,27 @@
      aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header" >
                 <button type="button" class="close"
                         data-dismiss="modal" aria-hidden="true">
                     &times;
                 </button>
-                <h4 class="modal-title" id="myModalLabel">
+                <h4 class="modal-title col-sm-10 " id="myModalLabel" style="top: -10;">
                     查询用户
                 </h4>
+
             </div>
             <div class="modal-body">
+
                 <form role="form">
+                    <input id="idForSearch"  name="id" type="hidden">
                     <div class="form-group">
                         <label>用户名</label>
-                        <input type="text" class="form-control" placeholder="请输入用户名" >
+                        <input type="text" class="form-control" id = "nameForSearch" name="userName"placeholder="请输入用户名" >
                     </div>
                     <div class="form-group">
                         <label>密码</label>
-                        <input type="password" class="form-control" placeholder="请输入密码" >
+                        <input type="password" class="form-control" id = "pwdForSearch" name="pwd" placeholder="请输入密码" >
                     </div>
                     <div class="form-group">
                         <input type="submit" >
@@ -149,12 +194,10 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default"
-                        data-dismiss="modal">关闭
-                </button>
-                <button type="button" class="btn btn-primary">
-                    提交更改
-                </button>
+                <!--data-dismiss="modal"-->
+                <button type="button" class="btn btn-default" id= "closeModal">关闭</button>
+                <input type="button" class="btn col-sm-2 pull-right btn-primary" value="编辑" id="editModal" >
+                <button type="button" class="btn btn-primary" id="updateModal" style="display:none">提交更改</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal -->
@@ -237,6 +280,7 @@
                     <th colspan="8">查询结果</th>
                 </tr>
                 <tr>
+                    <th><input type="checkbox" name="checkBoxs" id="checkBoxs"> </th>
                     <th>ID</th>
                     <th>用户名</th>
                     <th>用户密码</th>
@@ -246,15 +290,15 @@
                 </tr>
                 </thead>
                 <tbody>
-                <c:forEach items="${page.list}" var="country">
+                <c:forEach items="${page.list}" var="country" varStatus="v">
                     <tr>
+                        <td><input type="checkbox" name="checkBoxs" id="checkBox${v}"></td>
                         <td>${country.id}</td>
                         <td>${country.name}</td>
                         <td>${country.pwd}</td>
                         <td>${country.createTime}</td>
                         <td>${country.updateTime}</td>
-                        <td ><a  class="btn btn-primary" onclick="getme(${country.id})">查询</a></td>
-                        <td ><a class="btn btn-primary">更新</a></td>
+                        <td ><a  class="btn btn-primary search" >查询</a></td>
                         <td ><a class="btn btn-primary" href="${pageContext.request.contextPath}/userController/${country.id}/delUser.do?pageNum=${page.pageNum}&pageSize=${page.pageSize}">删除</a></td>
                     </tr>
                 </c:forEach>

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -79,16 +80,19 @@ public class UserController {
 
     /**
      * RESTFUL 形式访问http://localhost:8080/userController/1/showUser2.do
+     ********return JSON.toJSONString(user);
+     ********因为在spring-mvc.xml配置了返回JSON格式，所以不用再另外需要转换为JSON格式了，
+     ********不然在前台获取的时候需要多转换一次JSON对象$.parseJSON()
      * @param id
      * @param request
-     * @return
+     * @return 用户对象：后台会直接给转换了JSON对象然后再传到前台
      */
     @ResponseBody
     @RequestMapping("/{id}/showUser2")
-    public String showUser2(@PathVariable String id, HttpServletRequest request){
+    public User showUser2(@PathVariable String id, HttpServletRequest request){
         User  user = userServiceI.getUserById(Integer.valueOf(id));
-        request.setAttribute("user",JSON.toJSONString(user));
-         return JSON.toJSONString(user);
+
+        return user;
     }
 
     @RequestMapping("/searchUser")
@@ -174,6 +178,36 @@ public class UserController {
     }
 
 
+    /**
+     * 更新用户
+     * @return 1:success;0 fail
+     */
+    @ResponseBody
+    @RequestMapping("/updateUser")
+    public String updateUser(HttpServletRequest request){
+        String id = request.getParameter("id");
+        String name = request.getParameter("name");
+        String pwd = request.getParameter("pwd");
+        String returnValue = "1";
+        try {
+            User oldUser = userServiceI.getUserById(Integer.valueOf(id));
+            logger.info("OldUser:"+JSON.toJSONStringWithDateFormat(oldUser,"yyyy-MM-dd HH:mm:ss"));
+            oldUser.setName(name);
+            oldUser.setPwd(pwd);
+            oldUser.setUpdateTime(new Date());
+            int num = userServiceI.updByUserID(oldUser);
+
+          if(1!= num){
+              returnValue="0";
+          }
+        } catch (Exception e) {
+            //TODO 加上删除用户的详细信息
+            logger.error("更新用户失败",e);
+            request.setAttribute("errorMsg", "查询出错:" + e.getMessage());
+            returnValue = e.getMessage();
+        }
+        return returnValue;
+    }
 
 
 }
