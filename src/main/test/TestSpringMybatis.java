@@ -94,7 +94,7 @@ public class TestSpringMybatis {
         int count = 0;
         User user = new User();
         try {
-            for(int i =0;i<20;i++){
+            for(int i =0;i<40;i++){
                 user.setName("testinsert"+i);
                 user.setPwd("123");
                 user.setCreateTime(DateUtil.getCurDate(DateUtil.DEFAULT_DATETIME_FORMAT_SEC));

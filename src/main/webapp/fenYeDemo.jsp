@@ -1,13 +1,13 @@
-<%@ page import="com.mybatis.service.UserServiceI" %>
-<%@ page import="com.mybatis.service.UserServiceImpl" %>
-<%@ page import="com.mybatis.model.User" %>
-<%@ page import="com.alibaba.fastjson.JSON" %>
-<%@ page import="java.util.Date" %>
 <%--
     User:     Darlen liu
     Date:     15-6-22 下午2:40
     Function: 这是一个关于mybatis的分页demo
 --%>
+<%@ page import="com.mybatis.service.UserServiceI" %>
+<%@ page import="com.mybatis.service.UserServiceImpl" %>
+<%@ page import="com.mybatis.model.User" %>
+<%@ page import="com.alibaba.fastjson.JSON" %>
+<%@ page import="java.util.Date" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
@@ -86,45 +86,48 @@
         }
     </style>
     <link rel="stylesheet" type="text/css" href="vender/bootstrap-3.3.5/css/bootstrap.css">
-
     <script type="text/javascript" src="http://apps.bdimg.com/libs/jquery/2.0.0/jquery.js"></script>
+
     <script type="text/javascript">
+        var pageNum = "";
+        var pageSize = "";
         $(function(){
+            pageNum = $("#tableFrm input[name=pageNum]").val();
+            pageSize = $("#tableFrm input[name=pageSize]").val();
+            /*
+            *注意：当调用modal事件在jQuery事件里面时，如果多次调用jQuery事件，modal事件也会多次调用
+            * 1.on事件，必需off()事件remove监听，不然触发多次,比如当test点击第二次时，alert也会弹出2次
+            * $("#test").click(function(){
+            *     $("#myModal").modal('toggle').off('hidden.bs.modal').on('hidden.bs.modal',function(event){
+            *         alert(1);
+            *     })
+            * })
+            *
+            * 2.one事件，可以完美解决多次调用问题
+            * */
             //for search event
             $(".search").click(function(event){
-               var userID = $(this).parent().parent().find("td:eq(1)").text();
-                //$("#myModal").modal('toggle').on("show.bs.modal", function(e) {
-                // var link = $(e.relatedTarget);
-                //$(this).find(".modal-body").load(link.attr("href"));
-                // alert(1)
-                // });
-                $.ajax({
-                    url:"userController/"+userID+"/showUser2.do",
-                    method:"GET",
-                    dataType:"json",
-                    success: function(result){
-                        var retVal =result;
-                        $("#idForSearch").val(retVal.id);
-                        $("#nameForSearch").val(retVal.name).attr("disabled","disabled");
-                        $("#pwdForSearch").val(retVal.pwd).attr("disabled","disabled");
-                        $("#myModal").modal('toggle');
-                    }
+                var userID = $(this).parent().parent().find("td:eq(1)").text();
+                $("#myModal").modal({ Toggle:'toggle',remote: "userModal.html" })
+                        .one('shown.bs.modal',function(){
+                    $.ajax({
+                        url:"userController/"+userID+"/showUser2.do",
+                        method:"GET",
+                        dataType:"json",
+                        success: function(result){
+                            var retVal =result;
+                            $("#idForSearch").val(retVal.id);
+                            $("#nameForSearch").val(retVal.name).attr("disabled","disabled");
+                            $("#pwdForSearch").val(retVal.pwd).attr("disabled","disabled");
 
-                })
-                // $('#myModal').modal('toggle').on('show',function(){
-                //})
-
+                        }
+                    })
+                }).off('hidden.bs.modal').on('hidden.bs.modal',function(event){
+                    //删除缓存，不然下次点击不会再发请求，比如说不会再去重新拿userModal.html，导致userModal.html不能更新
+                    $( this ).removeData( "bs.modal" );
+                    $(".modal-content").empty();
+                });
             });
-
-            //for edit event
-            $("#editModal").click(function(event){
-                $("#nameForSearch").removeAttr("disabled");
-                $("#pwdForSearch").removeAttr("disabled");
-                //this.value="更新";
-                $("#updateModal").show();
-                $(this).hide();
-            });
-
             //for update event
             $("#updateModal").click(function(event){
                 var user ={
@@ -147,14 +150,67 @@
                             $("#myModal").modal('toggle');
                         }
                     }
-
                 })
             });
+
             $("#closeModal").click(function(){
                 $("#myModal").on("hidden.bs.model",function(e){$(this).removeData();});
             })
 
+            //for check all
+            $("#chkAll").click(function(){
+                var isChecked = $(this).is(":checked");
+                if(isChecked){
+                    $("input[name=userCB]").prop("checked","true");
+                    //$("input[name=userCB]").each(function(){
+                      //  $(this).attr("checked","true");
+                    //})
+                }else{
+                    $("input[name=userCB]").removeProp("checked");
+                }
+            })
+            //for delete one record
+            $(".delOne").click(function(){
+                if(confirm("你确认要删除这条数据吗？")){
+                    var userID = $(this).parent().parent().find("[name=objID]").val();
+                    window.location= "userController/"+userID+"/delUser.do?pageNum="+pageNum+"&pageSize="+pageSize;
+                }
+            })
+
+            //for delete multiple users
+            $("#delMultp").click(function(){
+                if(confirm("你确认要删除这些数据吗？")){
+                    var data = {
+                      "userIDs":getSeltChkBoxValue(),
+                       "pageNum":pageNum,
+                        "pageSize":pageSize
+                    };
+                    $.post("userController/batchDelUsers.do",data,function(result){
+                        if("1" ==  result) {
+                            alert("删除成功");
+                            $("#myModal").modal('toggle');
+                            window.location.reload()
+                        }else{
+                            alert("删除失败:"+result);
+                            $("#myModal").modal('toggle');
+                        }
+                    },"json");
+                }
+             })
         })
+
+        function getSeltChkBoxValue(){
+            var seltValues = "";
+            $("input[name=userCB]:checked").each(function(index,curObj){
+                seltValues +=  $(this).next("[name=objID]").val() + ",";
+                //seltValues += $(this).parent().find("input[name=objID]").val();
+            })
+            console.info("" != seltValues ? seltValues.substr(0,seltValues.length-1):"");
+            return "" != seltValues ? seltValues.substr(0,seltValues.length-1):"";
+        }
+
+
+
 
 </script>
 
@@ -188,14 +244,11 @@
                         <label>密码</label>
                         <input type="password" class="form-control" id = "pwdForSearch" name="pwd" placeholder="请输入密码" >
                     </div>
-                    <div class="form-group">
-                        <input type="submit" >
-                    </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <!--data-dismiss="modal"-->
-                <button type="button" class="btn btn-default" id= "closeModal">关闭</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" id= "closeModal">关闭</button>
                 <input type="button" class="btn col-sm-2 pull-right btn-primary" value="编辑" id="editModal" >
                 <button type="button" class="btn btn-primary" id="updateModal" style="display:none">提交更改</button>
             </div>
@@ -219,9 +272,9 @@
             <table class="gridtable" style="width:100%;">
                 <tr>
                     <th>页码：</th>
-                    <td><input type="text" name="pageNum" value="${pageNum}"/></td>
+                    <td><input type="text" name="pageNum" value="${page.pageNum}"/></td>
                     <th>页面大小：</th>
-                    <td><input type="text" name="pageSize" value="${pageSize}"/></td>
+                    <td><input type="text" name="pageSize" value="${page.pageSize}"/></td>
                     <td><input type="submit" value="查询"/></td>
                 </tr>
             </table>
@@ -274,60 +327,67 @@
                     <td>${page.hasNextPage}</td>
                 </tr>
             </table>
-            <table class="gridtable" style="width:100%;">
-                <thead>
-                <tr>
-                    <th colspan="8">查询结果</th>
-                </tr>
-                <tr>
-                    <th><input type="checkbox" name="checkBoxs" id="checkBoxs"> </th>
-                    <th>ID</th>
-                    <th>用户名</th>
-                    <th>用户密码</th>
-                    <th>创建时间</th>
-                    <th>更新时间</th>
-                    <th colspan="3">操作</th>
-                </tr>
-                </thead>
-                <tbody>
-                <c:forEach items="${page.list}" var="country" varStatus="v">
+            <form name = "tableFrm" id="tableFrm">
+                <input type="hidden" name="pageNum" value="${page.pageNum}"/>
+                <input type="hidden" name="pageSize" value="${page.pageSize}"/>
+                <table class="gridtable" style="width:100%;">
+                    <thead>
                     <tr>
-                        <td><input type="checkbox" name="checkBoxs" id="checkBox${v}"></td>
-                        <td>${country.id}</td>
-                        <td>${country.name}</td>
-                        <td>${country.pwd}</td>
-                        <td>${country.createTime}</td>
-                        <td>${country.updateTime}</td>
-                        <td ><a  class="btn btn-primary search" >查询</a></td>
-                        <td ><a class="btn btn-primary" href="${pageContext.request.contextPath}/userController/${country.id}/delUser.do?pageNum=${page.pageNum}&pageSize=${page.pageSize}">删除</a></td>
+                        <th colspan="8">查询结果</th>
                     </tr>
-                </c:forEach>
-                </tbody>
-            </table>
-            <table class="gridtable" style="width:100%;text-align: center;">
-                <tr>
-                    <c:if test="${nav != page.pageNum}">
-                        <td><a href="${pageContext.request.contextPath}/userController/getAllUserWithPage.do?pageNum=1&pageSize=${page.pageSize}">首页</a></td>
-                    </c:if>
-                    <c:if test="${page.hasPreviousPage}">
-                        <td><a href="${pageContext.request.contextPath}/userController/getAllUserWithPage.do?pageNum=${page.prePage}&pageSize=${page.pageSize}">前一页</a></td>
-                    </c:if>
-                    <c:forEach items="${page.navigatepageNums}" var="nav">
-                        <c:if test="${nav == page.pageNum}">
-                            <td style="font-weight: bold;">${nav}</td>
+                    <tr>
+                        <th colspan="8"><input type="button" value="批量删除" name="delMultp" id="delMultp" class="btn btn-primary"></th>
+                    </tr>
+                    <tr>
+                        <th><input type="checkbox" name="userCBs" id="chkAll"> </th>
+                        <th>ID</th>
+                        <th>用户名</th>
+                        <th>用户密码</th>
+                        <th>创建时间</th>
+                        <th>更新时间</th>
+                        <th colspan="3">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="dataTable">
+                    <c:forEach items="${page.list}" var="user" varStatus="v">
+                        <tr>
+                            <td><input type="checkbox" name="userCB" id="checkBox${v.index}"><input type="hidden" name="objID" value="${user.id}"></td>
+                            <td>${user.id}</td>
+                            <td>${user.name}</td>
+                            <td>${user.pwd}</td>
+                            <td>${user.createTime}</td>
+                            <td>${user.updateTime}</td>
+                            <td ><a  class="btn btn-primary search" >查询</a></td>
+                            <td ><a class="btn btn-primary delOne"  >删除</a></td>
+                        </tr>
+                    </c:forEach>
+                    </tbody>
+                </table>
+                <table class="gridtable" style="width:100%;text-align: center;">
+                    <tr>
+                        <c:if test="${nav != page.pageNum}">
+                            <td><a href="${pageContext.request.contextPath}/userController/getAllUserWithPage.do?pageNum=1&pageSize=${page.pageSize}">首页</a></td>
+                        </c:if>
+                        <c:if test="${page.hasPreviousPage}">
+                            <td><a href="${pageContext.request.contextPath}/userController/getAllUserWithPage.do?pageNum=${page.prePage}&pageSize=${page.pageSize}">前一页</a></td>
+                        </c:if>
+                        <c:forEach items="${page.navigatepageNums}" var="nav">
+                            <c:if test="${nav == page.pageNum}">
+                                <td style="font-weight: bold;">${nav}</td>
+                            </c:if>
+                            <c:if test="${nav != page.pageNum}">
+                                <td><a href="${pageContext.request.contextPath}/userController/getAllUserWithPage.do?pageNum=${nav}&pageSize=${page.pageSize}">${nav}</a></td>
+                            </c:if>
+                        </c:forEach>
+                        <c:if test="${page.hasNextPage}">
+                            <td><a href="${pageContext.request.contextPath}/userController/getAllUserWithPage.do?pageNum=${page.nextPage}&pageSize=${page.pageSize}">下一页</a></td>
                         </c:if>
                         <c:if test="${nav != page.pageNum}">
-                            <td><a href="${pageContext.request.contextPath}/userController/getAllUserWithPage.do?pageNum=${nav}&pageSize=${page.pageSize}">${nav}</a></td>
+                            <td><a href="${pageContext.request.contextPath}/userController/getAllUserWithPage.do?pageNum=${page.pages}&pageSize=${page.pageSize}">最后一页</a></td>
                         </c:if>
-                    </c:forEach>
-                    <c:if test="${page.hasNextPage}">
-                        <td><a href="${pageContext.request.contextPath}/userController/getAllUserWithPage.do?pageNum=${page.nextPage}&pageSize=${page.pageSize}">下一页</a></td>
-                    </c:if>
-                    <c:if test="${nav != page.pageNum}">
-                        <td><a href="${pageContext.request.contextPath}/userController/getAllUserWithPage.do?pageNum=${page.pages}&pageSize=${page.pageSize}">最后一页</a></td>
-                    </c:if>
-                </tr>
-            </table>
+                    </tr>
+                </table>
+            </form>
         </c:if>
     </div>
     <div class="push"></div>

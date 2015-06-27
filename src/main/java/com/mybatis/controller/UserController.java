@@ -13,6 +13,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.mybatis.model.User;
 import com.mybatis.service.UserServiceI;
+import com.mybatis.util.StringUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -147,38 +149,6 @@ public class UserController {
     }
 
     /**
-     * RESTFUL 形式访问http://localhost:8080/mybatisdemo1/userController/29/delUser.do?pageNum=1&pageSize=10
-     * @param id
-     * @param request
-     * @return
-     */
-    @RequestMapping("/{id}/delUser")
-    public String delUser(@PathVariable String id, HttpServletRequest request){
-        String str_pageNum = request.getParameter("pageNum");
-        String str_pageSize = request.getParameter("pageSize");
-        try {
-            PageHelper.startPage(Integer.valueOf(str_pageNum), Integer.valueOf(str_pageSize));
-            int num =  userServiceI.delUserByID(Integer.valueOf(id));
-            if(1 == num) {
-                //TODO 加上删除用户的详细信息
-                logger.info("删除用户成功");
-                List<User> list =  userServiceI.getAllUser();
-                PageInfo<User> page = new PageInfo(list,3);
-                request.setAttribute("page", page);
-            }else{
-                logger.error("删除用户失败");
-                throw new Exception("删除用户数量为"+num);
-            }
-        } catch (Exception e) {
-            //TODO 加上删除用户的详细信息
-            logger.error("删除用户失败",e);
-            request.setAttribute("errorMsg", "查询出错:" + e.getMessage());
-        }
-        return "fenYeDemo";
-    }
-
-
-    /**
      * 更新用户
      * @return 1:success;0 fail
      */
@@ -207,6 +177,75 @@ public class UserController {
             returnValue = e.getMessage();
         }
         return returnValue;
+    }
+
+    /**
+     * RESTFUL 形式访问http://localhost:8080/mybatisdemo1/userController/29/delUser.do?pageNum=1&pageSize=10
+     * @param id
+     * @param request
+     * @return
+     */
+    @RequestMapping("/{id}/delUser")
+    public String delUser(@PathVariable String id, HttpServletRequest request){
+        String str_pageNum = request.getParameter("pageNum");
+        String str_pageSize = request.getParameter("pageSize");
+        try {
+            PageHelper.startPage(Integer.valueOf(str_pageNum), Integer.valueOf(str_pageSize));
+            int num =  userServiceI.delUserByID(Integer.valueOf(id));
+            if(1 == num) {
+                //TODO 加上删除用户的详细信息
+                logger.info("删除用户成功："+id);
+                List<User> list =  userServiceI.getAllUser();
+                PageInfo<User> page = new PageInfo(list,3);
+                request.setAttribute("page", page);
+            }else{
+                logger.error("删除用户失败："+id);
+                throw new Exception("删除用户数量为"+num);
+            }
+        } catch (Exception e) {
+            //TODO 加上删除用户的详细信息
+            logger.error("删除用户失败",e);
+            request.setAttribute("errorMsg", "删除出错:" + e.getMessage());
+        }
+        return "fenYeDemo";
+    }
+
+    /**
+     * RESTFUL 形式访问http://localhost:8080/mybatisdemo1/userController/batchDelUsers.do
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/batchDelUsers")
+    public int batchDelUsers( HttpServletRequest request){
+       int retVal = 1;
+        try {
+            String str_pageNum = request.getParameter("pageNum");
+            String str_pageSize = request.getParameter("pageSize");
+            String userIDs = request.getParameter("userIDs");
+            if(StringUtil.isEmpty(str_pageNum) || StringUtil.isEmpty(str_pageSize)
+                    || StringUtil.isEmpty(userIDs)){
+                logger.error("pageNum 或 pageSize 或 UserIDs不能为空。");
+                throw new Exception("pageNum 或 pageSize 或 UserIDs不能为空。");
+            }
+            PageHelper.startPage(Integer.valueOf(str_pageNum), Integer.valueOf(str_pageSize));
+            int num =  userServiceI.batchDelUserByIDs(Arrays.asList(userIDs.split(",")));
+            if(num > 0 ) {
+                logger.info("删除"+num+"个用户成功" + userIDs);
+                List<User> list =  userServiceI.getAllUser();
+                PageInfo<User> page = new PageInfo(list,3);
+                request.setAttribute("page", page);
+            }else{
+                logger.error("删除多个用户失败");
+                throw new Exception("删除用户数量为"+num);
+            }
+        } catch (Exception e) {
+            //TODO 加上删除用户的详细信息
+            logger.error("删除多个用户失败",e);
+            retVal = 0;
+            request.setAttribute("errorMsg", "查询出错:" + e.getMessage());
+        }
+        return retVal;
     }
 
 
