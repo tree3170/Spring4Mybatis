@@ -1,5 +1,6 @@
 package com.mybatis.model;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class User {
 
     private Date createTime;
 
-    private Date updateTime;
+    private String updateTime;
 
     public Integer getId() {
         return id;
@@ -51,11 +52,13 @@ public class User {
         this.createTime = createTime;
     }
 
-    public Date getUpdateTime() {
-        return updateTime;
+    public String getUpdateTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        return updateTime;//sdf.format(updateTime);
     }
 
-    public void setUpdateTime(Date updateTime) {
+    public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
     }
 

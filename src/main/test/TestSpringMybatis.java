@@ -94,14 +94,15 @@ public class TestSpringMybatis {
         int count = 0;
         User user = new User();
         try {
-            for(int i =0;i<40;i++){
-                user.setName("testinsert"+i);
+           // for(int i =40;i<41;i++){
+                user.setName("testinsert"+41);
                 user.setPwd("123");
-                user.setCreateTime(DateUtil.getCurDate(DateUtil.DEFAULT_DATETIME_FORMAT_SEC));
+               // user.setCreateTime(DateUtil.getCurDate(DateUtil.DEFAULT_DATETIME_FORMAT_SEC));
                 logger.info("######DATETIME:"+new Date().getTime());
-                user.setUpdateTime(new Timestamp(new Date().getTime()));
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                user.setUpdateTime(sdf.format(new Date()));//new Timestamp(new Date().getTime())
                 count = userServiceI.insertUser(user);
-            }
+           // }
 
            // Assert.assertEquals("########not the expect result",1,count);
         }catch (Exception e){
@@ -116,12 +117,14 @@ public class TestSpringMybatis {
 
     @Test
     public void testUpdateUser() throws Exception {
-        User user = userServiceI.getUserByName("testinsert");
+        User user = userServiceI.getUserByName("testinsert40");
         user.setPwd("125");
+        //user.setCreateTime(new java.sql.Date(new Date().getTime()));
         user.setCreateTime(new java.sql.Date(new Date().getTime()));
        // user.setUpdateTime(DateUtil.getCurDate(DateUtil.DEFAULT_DATETIME_FORMAT_SEC));
-        user.setUpdateTime(new Timestamp(new Date().getTime()));
-       // user.setUpdateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+       // user.setUpdateTime(new Timestamp(newUserRoleMapper Date().getTime()));
+        //updatetime 是string类型，mybatis配置文件不配类型，这样可以解决丢失时分秒的问题
+        user.setUpdateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         int num = userServiceI.updByUserID(user);
         logger.info("###########num="+num);
     }

@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://java.sun.com/xml/ns/javaee"
-         xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
          id="WebApp_ID" version="3.0">
     <display-name>mybatis</display-name>
-    <!-- 读取spring配置文件 -->
+
+    <!-- 指定配置文件：读取spring配置文件 -->
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>classpath:spring.xml,classpath:spring-mybatis.xml</param-value>
     </context-param>
 
     <!-- 设计路径变量值 -->
+    <!--<context-param>-->
+        <!--<param-name>mybatisdemo1</param-name>-->
+        <!--<param-value>springmvc.root</param-value>-->
+    <!--</context-param>-->
+    <!-- 设置webAppRootKey(默认value是webapp.root),可以在log4j.properties里面通过${myWebApp.root}获取当前项目路径 -->
     <context-param>
-        <param-name>mybatisdemo1</param-name>
-        <param-value>springmvc.root</param-value>
+        <param-name>webAppRootKey</param-name>
+        <param-value>myWebApp.root</param-value>
     </context-param>
     <!-- 日志记录 -->
     <context-param>
@@ -28,6 +34,15 @@
         <param-name>log4jRefreshInterval</param-name>
         <param-value>6000</param-value>
     </context-param>
+
+    <!--注册JSTL的i18n事件，value必需指定为全路径-->
+    <context-param>
+        <param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
+        <!--<param-name>org.springframework.web.servlet.support.JstlUtils</param-name>-->
+        <param-value>com.mybatis.i18n.ssm</param-value>
+    </context-param>
+
+    <!--Log4jInitServlet-->
     <servlet>
         <servlet-name>Log4jInitServlet</servlet-name>
         <servlet-class>com.mybatis.servlet.Log4jInitServlet</servlet-class>
@@ -44,6 +59,7 @@
     配置文件和log输出路径，
     ***注意该 listener需要放在spring的Listener之前***  -->
     <listener>
+        <description>Log4jConfigListener</description>
         <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
     </listener>
 
@@ -67,6 +83,7 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
+    <!--Spring 监听器-->
     <listener>
         <description>spring监听器</description>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -76,6 +93,7 @@
     <listener>
         <listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
     </listener>
+
     <!-- spring mvc servlet -->
     <servlet>
         <description>spring mvc servlet</description>
@@ -90,7 +108,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>springMvc</servlet-name>
-        <url-pattern>*.do</url-pattern>
+        <url-pattern>/</url-pattern>
     </servlet-mapping>
 
     <!-- 解决HTTP PUT请求Spring无法获取请求参数的问题

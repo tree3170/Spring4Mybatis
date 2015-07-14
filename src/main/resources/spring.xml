@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xsi:schemaLocation="
 http://www.springframework.org/schema/beans
-http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
 http://www.springframework.org/schema/context
-http://www.springframework.org/schema/context/spring-context-3.0.xsd
+http://www.springframework.org/schema/context/spring-context-4.1.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
 ">
 
 	<!-- 引入属性文件 -->
@@ -11,6 +16,45 @@ http://www.springframework.org/schema/context/spring-context-3.0.xsd
 
 	<!-- 自动扫描(自动注入) -->
 	<context:component-scan base-package="com.mybatis" />
+    <mvc:default-servlet-handler/><!--静态资源的访问-->
+    <!--<mvc:resources mapping="/pic/**" location="/pic/" cache-period="31556926"/>-->
+    <!--<mvc:resources mapping="/vender/**" location="/vender/" cache-period="31556926"/>-->
+    <!-- 即告诉 spring mvc 使用注解的方式进行URL路由配置http://my.oschina.net/HeliosFly/blog/205343-->
+    <mvc:annotation-driven />
+
+    <!--**********************国际化支持信息配置*************************************************
+    ReloadableResourceBundleMessageSource(basename必需写成classpath: com/mybatis/i18n/ssm.
+    ResourceBundleMessageSource（basename可以写成com.mybatis.i18n.ssm或者com/mybatis/i18n/ssm）
+    -->
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basename" value="com.mybatis.i18n.ssm"/><!--base name 全路径-->
+        <!--默认为false，这样当Spring在ResourceBundle中找不到messageKey的话，就抛出NoSuchMessageException-->
+        <property name="useCodeAsDefaultMessage" value="true" />
+    </bean>
+
+    <!--<bean id="messageSourceHelper" class="com.mybatis.util.MessageSourceHelper">-->
+        <!--<property name="messageSource"  ref="messageSource"/>-->
+    <!--</bean>-->
+
+    <!-- 国际化操作 拦截器 必需配置,可以和其它国际化方式通用 -->
+    <bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor" >
+            <property name="paramName" value="lang"></property>
+     </bean>
+    <!--<bean id="defaultUrlMapping" class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping">-->
+        <!--<property name="interceptors" ref="localeChangeInterceptor" />-->
+    <!--</bean>-->
+
+    <mvc:interceptors>
+        <!--<bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor" />-->
+        <mvc:interceptor>
+            <mvc:mapping path="/*"/>
+            <bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor" />
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
+        <property name="defaultLocale" value="en"></property>
+    </bean>
 
 
 </beans>

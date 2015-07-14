@@ -54,7 +54,7 @@ public class Log4jInitServlet extends HttpServlet{
             pro.setProperty("log4j.appender.Info_File.File",logFileErrorLocation);
             logger.debug("##################Log File location:"+logFileInfoLocation);
             //设置log4j property
-            PropertyConfigurator.configure(pro);
+//            PropertyConfigurator.configure(pro);
         }catch (IOException e) {
            logger.error("####################Could not read the log4j.properties file ["+absLog4jLocation+"]");
            logger.error("####################Ignoring the configuration file ["+absLog4jLocation+"]");

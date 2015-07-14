@@ -16,18 +16,15 @@ import com.mybatis.service.UserServiceI;
 import com.mybatis.util.StringUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Description.
@@ -164,7 +161,7 @@ public class UserController {
             logger.info("OldUser:"+JSON.toJSONStringWithDateFormat(oldUser,"yyyy-MM-dd HH:mm:ss"));
             oldUser.setName(name);
             oldUser.setPwd(pwd);
-            oldUser.setUpdateTime(new Date());
+            //oldUser.setUpdateTime(new Date().getTime());
             int num = userServiceI.updByUserID(oldUser);
 
           if(1!= num){
@@ -247,6 +244,36 @@ public class UserController {
         }
         return retVal;
     }
+
+    /**
+     * 为国际化设置session级别的locale
+     * @param request
+     * @param model
+     * @param langType  默认是en
+     * @return
+     */
+    @RequestMapping(value ="/globalI18n",method = {RequestMethod.GET})
+    public String globalI18n(HttpServletRequest request,Model model, @RequestParam(value="lang", defaultValue="en") String langType){
+        Object obj = WebUtils.getSessionAttribute(request, SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME);
+        if(null != request.getParameter("lang") ){//如果传递了参数lang,则需要设置locale into session
+            if(langType.equals("zh")){
+                Locale locale = new Locale("zh", "CN");
+                request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME,locale);
+            }
+            else if(langType.equals("en")){
+                Locale locale = new Locale("en", "US");
+                request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME,locale);
+            }
+            else{
+                request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME, LocaleContextHolder.getLocale());
+            }
+        }else if(null == obj){//如果session is empty,则默认设置英文为当前locale
+            Locale locale = new Locale("en", "US");
+            request.getSession().setAttribute(SessionLocaleResolver.LOCALE_SESSION_ATTRIBUTE_NAME,locale);
+        }
+        return "WEB-INF/jsp/finalExample";
+    }
+
 
 
 }

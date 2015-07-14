@@ -10,6 +10,8 @@
 <%@ page import="java.util.Date" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%
     String path = request.getContextPath();
     String bathPath = request.getScheme() + "://" + request.getServerName() + ":" + request
@@ -275,7 +277,8 @@
                     <td><input type="text" name="pageNum" value="${page.pageNum}"/></td>
                     <th>页面大小：</th>
                     <td><input type="text" name="pageSize" value="${page.pageSize}"/></td>
-                    <td><input type="submit" value="查询"/></td>
+                    <td><input type="submit" value="<fmt:message key="btn.searchBtn"/>"/><spring:message code="btn.searchBtn"/></td>
+                    <td><input type="submit" value="<spring:message code="btn.searchBtn"/>"/></td>
                 </tr>
             </table>
         </form>

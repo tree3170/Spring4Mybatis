@@ -9,6 +9,7 @@
 package com.mybatis.service;
 
 import com.mybatis.dao.UserMapper;
+import com.mybatis.exception.CommonException;
 import com.mybatis.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.*;
@@ -51,11 +52,12 @@ public class UserServiceImpl implements  UserServiceI{
         int num = 0;
         try{
             num = userMapper.addObjSelective(user);
-            //throw new Exception("####################see roll back or not.");
+            //throw new Exception("测试事务回滚：抛出Exception，事务不会回滚####################see roll back or not.");
+            throw new CommonException("测试事务回滚：抛出RuntimeException，事务会回滚####################see roll back or not.");
         }catch (Exception e){
             throw e;
         }
-        return num;
+       // return num;
     }
 
     @Override

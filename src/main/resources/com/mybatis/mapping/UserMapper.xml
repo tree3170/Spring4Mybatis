@@ -14,8 +14,8 @@ NCLOB，BIGINT，DECIMAL，TIME，NULL，CURSOR-->
         在字段中有Date和DateTime类型，
         在插入数据时只要将实体的属性设置成Timestamp就会对应mysql的DateTime类型，Date会对应mysql的Date类型。
         -->
-        <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" javaType="DATE"/>
-        <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP"  javaType="DATE"/>
+        <result column="CREATE_TIME" property="createTime"/>
+        <result column="UPDATE_TIME" property="updateTime"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -83,79 +83,47 @@ NCLOB，BIGINT，DECIMAL，TIME，NULL，CURSOR-->
     <insert id="addObjSelective" parameterType="com.mybatis.model.User">
         insert into tuser
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                ID,
-            </if>
-            <if test="name != null">
-                NAME,
-            </if>
-            <if test="pwd != null">
-                PWD,
-            </if>
-            <if test="createTime != null">
-                CREATE_TIME,
-            </if>
-            <if test="updateTime != null">
-                UPDATE_TIME,
-            </if>
+            <if test="id != null">ID,</if>
+            <if test="name != null">NAME, </if>
+            <if test="pwd != null">PWD,</if>
+            <if test="createTime != null"> CREATE_TIME,</if>
+            <if test="updateTime != null">UPDATE_TIME,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                <![CDATA[  #{id,jdbcType=INTEGER}, ]]>
-            </if>
-            <if test="name != null">
-                <![CDATA[  #{name,jdbcType=VARCHAR}, ]]>
-            </if>
-            <if test="pwd != null">
-                <![CDATA[   #{pwd,jdbcType=VARCHAR},]]>
-            </if>
-            <if test="createTime != null">
-                <![CDATA[  #{createTime,jdbcType=DATE}, ]]>
-            </if>
-            <if test="updateTime != null">
-                <![CDATA[   #{updateTime,jdbcType=DATE}, ]]>
-            </if>
+            <if test="id != null"><![CDATA[  #{id,jdbcType=INTEGER}, ]]></if>
+            <if test="name != null"><![CDATA[  #{name,jdbcType=VARCHAR}, ]]></if>
+            <if test="pwd != null"> <![CDATA[   #{pwd,jdbcType=VARCHAR},]]></if>
+            <if test="createTime != null"><![CDATA[  #{createTime,jdbcType=DATE}, ]]></if>
+            <if test="updateTime != null"> <![CDATA[   #{updateTime,jdbcType=DATE}, ]]> </if>
         </trim>
     </insert>
 
     <update id="updObjByIDSelective" parameterType="com.mybatis.model.User">
         update tuser
         <set>
-            <if test="name != null">
-                NAME = <![CDATA[#{name,jdbcType=VARCHAR},]]>
-            </if>
-            <if test="pwd != null">
-                PWD =<![CDATA[ #{pwd,jdbcType=VARCHAR},]]>
-            </if>
-            <if test="createTime != null">
-                CREATE_TIME =<![CDATA[ #{createTime,jdbcType=DATE},]]>
-            </if>
-            <if test="updateTime != null">
-                UPDATE_TIME = <![CDATA[#{updateTime,jdbcType=DATE},]]>
-            </if>
+            <if test="name != null">NAME = <![CDATA[#{name,jdbcType=VARCHAR},]]></if>
+            <if test="pwd != null"> PWD =<![CDATA[ #{pwd,jdbcType=VARCHAR},]]></if>
+            <if test="createTime != null">CREATE_TIME =<![CDATA[ #{createTime,jdbcType=DATE},]]></if>
+            <if test="updateTime != null">UPDATE_TIME = <![CDATA[#{updateTime,jdbcType=DATE},]]></if>
         </set>
         where ID =<![CDATA[ #{id,jdbcType=INTEGER}]]>
     </update>
 
     <update id="updObjByID" parameterType="com.mybatis.model.User">
        <![CDATA[
-
         update tuser
         set NAME = #{name,jdbcType=VARCHAR},
           PWD = #{pwd,jdbcType=VARCHAR},
           CREATE_TIME = #{createTime,jdbcType=DATE},
           UPDATE_TIME = #{updateTime,jdbcType=DATE}
         where ID = #{id,jdbcType=INTEGER}
-
         ]]>
     </update>
 
     <delete id="delObjByID" parameterType="java.lang.Integer">
     <![CDATA[
-
         delete from tuser
         where ID = #{id,jdbcType=INTEGER}
-
         ]]>
     </delete>
 
