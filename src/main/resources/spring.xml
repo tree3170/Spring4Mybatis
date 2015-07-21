@@ -56,5 +56,8 @@ http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
         <property name="defaultLocale" value="en"></property>
     </bean>
 
+    <!--Exception Handler 例子-->
+    <mvc:view-controller path="/exceptionDemo" view-name="WEB-INF/jsp/testExceptionHandlerDemo"></mvc:view-controller>
+
 
 </beans>
