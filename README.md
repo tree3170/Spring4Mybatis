@@ -63,6 +63,29 @@ public class GloabalHandlerException {
         return "WEB-INF/jsp/testExceptionHandlerDemo";
     }
 }
+3.可以采用自定义的接口实现HandlerExceptionResolver，具体我就没做测试，可以参考：http://www.cnblogs.com/xd502djj/archive/2012/09/24/2700490.html
+<!-- 全局异常配置 start -->
+ <bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+	 <property name="exceptionMappings">
+		 <props>
+			 <prop key="java.lang.Exception">errors/error</prop>
+			 <prop key="java.lang.Throwable">errors/err</prop>
+		 </props>
+	 </property>
+	 <property name="statusCodes">
+		 <props>
+			 <prop key="errors/error">500</prop>
+			 <prop key="errors/404">404</prop>
+		 </props>
+	 </property>
+	 <!-- 设置日志输出级别，不定义则默认不输出警告等错误日志信息 -->
+	 <property name="warnLogCategory" value="WARN"></property>
+	 <!-- 默认错误页面，当找不到上面mappings中指定的异常对应视图时，使用本默认配置 -->
+	 <property name="defaultErrorView" value="errors/error"></property>
+	 <!-- 默认HTTP状态码 -->
+	 <property name="defaultStatusCode" value="500"></property>
+ </bean>
+ <!-- 全局异常配置 end -->
 
 
 
